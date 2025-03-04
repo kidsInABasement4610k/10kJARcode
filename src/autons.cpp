@@ -40,8 +40,7 @@ void odom_constants(){
   chassis.drive_min_voltage = 0;
 }
 
-//skills!
-void drive_test(){
+void skills(){
   chassis.drive_distance(4.5);
   clamp1.set(true);
   chassis.turn_to_angle(-135);
@@ -116,49 +115,24 @@ void drive_test(){
   chassis.drive_distance(15);
 }
 
-//red + quals
-void turn_test(){
-  chassis.turn_to_angle(5);
-  chassis.turn_to_angle(30);
-  chassis.turn_to_angle(90);
-  chassis.turn_to_angle(225);
-  chassis.turn_to_angle(0);
+void redPositive(){
+
 }
 
-//blue + quals
-void swing_test(){
-  chassis.left_swing_to_angle(90);
-  chassis.right_swing_to_angle(0);
+void bluePositive(){
+
 }
 
-//red - quals
-void full_test(){
-  chassis.drive_distance(24);
-  chassis.turn_to_angle(-45);
-  chassis.drive_distance(-36);
-  chassis.right_swing_to_angle(-90);
-  chassis.drive_distance(24);
-  chassis.turn_to_angle(0);
+void redNegative(){
+
 }
 
-//blue - quals
-void tank_odom_test(){
-  odom_constants();
-  chassis.set_coordinates(0, 0, 0);
-  chassis.turn_to_point(24, 24);
-  chassis.drive_to_point(24,24);
-  chassis.drive_to_point(0,0);
-  chassis.turn_to_angle(0);
+void blueNegative(){
+
 }
 
-//easy auto
-void holonomic_odom_test(){
-  odom_constants();
-  chassis.set_coordinates(0, 0, 0);
-  chassis.holonomic_drive_to_pose(0, 18, 90);
-  chassis.holonomic_drive_to_pose(18, 0, 180);
-  chassis.holonomic_drive_to_pose(0, 18, 270);
-  chassis.holonomic_drive_to_pose(0, 0, 0);
+void simpleAuto(){
+
 }
 
 /**

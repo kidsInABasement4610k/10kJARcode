@@ -16,3 +16,14 @@ void tank_odom_test();
 void holonomic_odom_test();
 
 //My autons
+void skills();
+void redPositive();
+void redNegative();
+void bluePositive();
+void blueNegative();
+void simpleAuto();
+
+void redPositiveElims();
+void redNegativeElims();
+void bluePositiveElims();
+void blueNegativeElims();

@@ -143,19 +143,19 @@ void pre_auton() {
       Brain.Screen.clearScreen();
       Brain.Screen.setCursor(1, 1);
       if(beepy == 1){
-        Brain.Screen.printAt(5, 140, "red left auton");
+        Brain.Screen.printAt(5, 140, "red positive auton");
         AllianceColor = red;
         NotAllianceColor = blue;
       } else if(beepy == 2){
-        Brain.Screen.printAt(5, 140, "red right auton");
+        Brain.Screen.printAt(5, 140, "red negative auton");
         AllianceColor = red;
         NotAllianceColor = blue;
       } else if(beepy == 3){
-        Brain.Screen.printAt(5, 140, "blue left auton");
+        Brain.Screen.printAt(5, 140, "blue positive auton");
         AllianceColor = blue;
         NotAllianceColor = red;
       } else if(beepy == 4){
-        Brain.Screen.printAt(5, 140, "blue right auton");
+        Brain.Screen.printAt(5, 140, "blue negative auton");
         AllianceColor = blue;
         NotAllianceColor = red;
       } else if(beepy == 5){
@@ -164,7 +164,7 @@ void pre_auton() {
         NotAllianceColor = blue;
       } else {
         beepy = 0;
-        Brain.Screen.printAt(5, 140, "no auton - keep holding the bumper to go back to red left!");
+        Brain.Screen.printAt(5, 140, "no auton - keep holding the bumper to go back to red positive!");
       }
     }
     wait(600, msec);
@@ -180,25 +180,25 @@ void pre_auton() {
 
 void autonomous(void) {
   auto_started = true;
-  drive_test();
+  skills();
   /*
   switch(beepy){ 
     case 0: //nothing
       break;
-    case 1: //red left,      
-      turn_test();
+    case 1: //red positive   
+      redPositive();
       break;
-    case 2: //red right
-      full_test();
+    case 2: //red negative
+      redNegative();
       break;
-    case 3: //blue left
-      turn_test();
+    case 3: //blue positive
+      bluePositive();
       break;
-    case 4: //blue right
-      full_test();
+    case 4: //blue negative
+      blueNegative();
       break;
     case 5: //skills
-      drive_test();
+      skills();
       break;
   }*/
 
