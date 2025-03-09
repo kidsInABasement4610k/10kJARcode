@@ -4,9 +4,6 @@ using namespace vex;
 competition Competition;
 int beepy = 0;
 int intakeToggle = 0;
-int tessaToggle = 0;
-//color Blue = color(66, 187, 252);
-//color Red = color(250, 37, 52);
 color AllianceColor = red;
 color NotAllianceColor = blue;
 
@@ -57,7 +54,7 @@ motor_group(leftFront, leftMiddle, leftBack),
 motor_group(rightFront, rightMiddle, rightBack),
 
 //Specify the PORT NUMBER of your inertial sensor, in PORT format (i.e. "PORT1", not simply "1"):
-PORT21,
+PORT16,
 
 //Input your wheel diameter. (4" omnis are actually closer to 4.125"):
 3.25,
@@ -171,17 +168,9 @@ void pre_auton() {
   }
 }
 
-/**
- * Auton function, which runs the selected auton. Case 0 is the default,
- * and will run in the brain screen goes untouched during preauton. Replace
- * drive_test(), for example, with your own auton function you created in
- * autons.cpp and declared in autons.h.
- */
-
 void autonomous(void) {
   auto_started = true;
-  skills();
-  /*
+  beepy = 2;
   switch(beepy){ 
     case 0: //nothing
       break;
@@ -200,8 +189,7 @@ void autonomous(void) {
     case 5: //skills
       skills();
       break;
-  }*/
-
+  }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -251,8 +239,36 @@ int reDirect(){
   }
 }
 
+const int numStates = 3;
+int states[numStates] = {0, -400, -55}; //Create array of target degree values
+int currState = 0;
+int target = 0;
+void nextState() {
+  //Cycle to next state
+  ++currState;
+  if (currState == numStates) currState = 0;
+  target = states[currState]; //Update target arm position
+}
+bool down = false;
+void nextDoinker() {
+  down = !down;
+}
+void doinker(){
+  deviDoinker.set(down);
+}
+void liftControl() {
+  double kp = 0.07; //tune this to your robot
+  double error = target - roti.position(degrees);
+  //If you don't have a rotation sensor, replace rotationSensor.position(degrees) with LB.position(degrees)
+  rightLb.spin(forward, error*kp, volt);
+  leftLb.spin(forward, error*kp, volt);
+}
+
 void usercontrol(void) {
   // User control code here, inside the loop
+  thread r (reDirect);
+  //roti.setReversed(true);
+  roti.resetPosition();
   while (1) {
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
@@ -264,15 +280,12 @@ void usercontrol(void) {
     // ........................................................................
 
     //Replace this line with chassis.control_tank(); for tank drive 
-    //or chassis.control_holonomic(); for holo drive.
-    thread r (reDirect);
-    
-    double leftSpeed = -(Controller1.Axis3.position() - (Controller1.Axis1.position() * .67));
-    double rightSpeed = -(Controller1.Axis3.position() + (Controller1.Axis1.position() * .67));
+    //or chassis.control_holonomic(); for holo drive.    
+    double leftSpeed = -(Controller1.Axis3.position() - (Controller1.Axis1.position() * .75));
+    double rightSpeed = -(Controller1.Axis3.position() + (Controller1.Axis1.position() * .75));
     Brain.Screen.clearScreen();
     Brain.Screen.setCursor(1, 1);
     Brain.Screen.print(opt.hue());
-    katieRerouter.setStopping(coast);
 
     //exponents that *should* work: 2.12, 2.2, 2.28, 2.296, 2.36, 2.6, 2.76, 2.92, 3
     
@@ -301,27 +314,13 @@ void usercontrol(void) {
       clamp1.set(false);
     }
 
-    if(Controller1.ButtonA.pressing()){
-      if(tessaToggle == 0){
-        deviDoinker.set(false);
-        tessaToggle++;
-        wait(100, msec);
-      } else if(tessaToggle == 1){
-        deviDoinker.set(true);
-        tessaToggle--;
-        wait(100, msec);
-      }
-    } 
+    Controller1.ButtonA.pressed(nextDoinker);
+    doinker();
 
-    if(Controller1.ButtonX.pressing()){
-      katieRerouter.spin(forward, 100, pct);
-    } else if(Controller1.ButtonY.pressing()){
-      katieRerouter.spin(reverse, 100, pct);
-    }
-    
-    wait(150, msec);
+    Controller1.ButtonX.pressed(nextState);
+    liftControl();
 
-    //chassis.control_arcade();
+    wait(10, msec);
   }
 }
 

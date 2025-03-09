@@ -20,8 +20,9 @@ extern motor leftMiddle;
 extern digital_out clamp1;
 extern inertial aniNertial;
 extern motor intake;
-extern motor katieRerouter;
 extern optical opt;
-
+extern motor rightLb;
+extern motor leftLb;
+extern rotation roti;
 
 void  vexcodeInit( void );

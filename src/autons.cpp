@@ -124,7 +124,19 @@ void bluePositive(){
 }
 
 void redNegative(){
-
+  chassis.drive_distance(8);
+  clamp1.set(true);
+  intake.spin(fwd, 100, pct);
+  wait(200, msec);
+  chassis.turn_to_angle(-90);
+  chassis.drive_distance(-7);
+  wait(400, msec);
+  chassis.turn_to_angle(-175);
+  chassis.drive_distance(-5);
+  wait(400, msec);
+  chassis.drive_distance(2);
+  chassis.turn_to_angle(-160);
+  chassis.drive_distance(-1);
 }
 
 void blueNegative(){
