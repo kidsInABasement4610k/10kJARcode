@@ -115,15 +115,20 @@ void skills(){
   chassis.drive_distance(15);
 }
 
-void redPositive(){
-
-}
-
 void bluePositive(){
-
+  chassis.drive_distance(8);
+  clamp1.set(true);
+  intake.spin(fwd,100,pct);
+  wait(200, msec);
+  chassis.turn_to_angle(90);
+  chassis.drive_distance(-12);
+  wait(600, msec);
+  intake.stop(hold);
+  chassis.turn_to_angle(-110);
+  chassis.drive_distance(-14.5);
 }
 
-void redNegative(){
+void blueNegative(){
   chassis.drive_distance(8);
   clamp1.set(true);
   intake.spin(fwd, 100, pct);
@@ -133,17 +138,48 @@ void redNegative(){
   wait(400, msec);
   //chassis.turn_to_angle(-180);
   chassis.turn_to_angle(165);
-  chassis.drive_distance(-5);
+  chassis.drive_distance(-5.5);
   wait(400, msec);
   chassis.drive_distance(4);
   chassis.turn_to_angle(-180);
-  chassis.drive_distance(-2);
+  chassis.drive_distance(-8);
   wait(400, msec);
-  chassis.drive_distance(8);
+  chassis.drive_distance(4);
+  chassis.turn_to_angle(-85);
+  chassis.drive_distance(13);
 }
 
-void blueNegative(){
+void redNegative(){
+ chassis.drive_distance(8);
+  clamp1.set(true);
+  intake.spin(fwd, 100, pct);
+  wait(200, msec);
+  chassis.turn_to_angle(90);
+  chassis.drive_distance(-10);
+  wait(400, msec);
+  chassis.turn_to_angle(-165);
+  chassis.drive_distance(-5.5);
+  wait(400, msec);
+  chassis.drive_distance(4);
+  chassis.turn_to_angle(180);
+  chassis.drive_distance(-8);
+  wait(400, msec);
+  chassis.drive_distance(4);
+  chassis.turn_to_angle(85);
+  chassis.drive_distance(13);
+}
 
+void redPositive(){
+  chassis.drive_distance(8);
+  clamp1.set(true);
+  intake.spin(fwd,100,pct);
+  wait(200, msec);
+  chassis.turn_to_angle(-90);
+  chassis.drive_distance(-12);
+  wait(600, msec);
+  intake.stop(hold);
+  chassis.turn_to_angle(-110);
+  chassis.drive_distance(-14.5);
 }
 
 void simpleAuto(){
@@ -164,6 +200,8 @@ void simpleAuto(){
     Brain.Screen.printAt(5,60, "Heading: %f", chassis.get_absolute_heading());
     Brain.Screen.printAt(5,80, "ForwardTracker: %f", chassis.get_ForwardTracker_position());
     Brain.Screen.printAt(5,100, "SidewaysTracker: %f", chassis.get_SidewaysTracker_position());
-    task::sleep(20);
+    wait(20, msec);
   }
 }
+message.txt
+6 KB
