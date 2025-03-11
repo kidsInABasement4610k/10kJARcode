@@ -3,7 +3,6 @@
 using namespace vex;
 competition Competition;
 int beepy = 0;
-int intakeToggle = 0;
 color AllianceColor = red;
 color NotAllianceColor = blue;
 
@@ -202,47 +201,11 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-int reDirect(){
-  while(true){
-    if(Controller1.ButtonB.pressing()){
-      while(opt.hue() > 40 && AllianceColor == red){
-        if(Controller1.ButtonL1.pressing() || Controller1.ButtonL2.pressing()){
-          break;
-        }
-        intake.spin(forward, 100, pct);
-        intakeToggle = 2;
-      }
-      intake.resetPosition();
-      wait(10, msec);
-      while(intake.position(degrees) > -1300){
-        intake.spin(reverse, 100, pct);
-      }
-      intake.stop();
-      intakeToggle = 0;
-      while((!(opt.hue() > 170 && opt.hue() < 250)) && AllianceColor == blue){
-        if(Controller1.ButtonL1.pressing() || Controller1.ButtonL2.pressing()){
-          break;
-        }
-        intake.spin(forward, 100, pct);
-        intakeToggle = 2;
-      }
-      intake.resetPosition();
-      wait(10, msec);
-      while(intake.position(degrees) > -1300){
-        intake.spin(reverse, 100, pct);
-      }
-      intake.stop();
-      intakeToggle = 0;
-    
-    }
-    wait(25, msec);
-  }
-}
-
 const int numStates = 3;
-int states[numStates] = {0, -400, -55}; //Create array of target degree values
+int states[numStates] = {0, -450, -55}; //Create array of target degree values
 int currState = 0;
 int target = 0;
+bool reversed = false;
 void nextState() {
   //Cycle to next state
   ++currState;
@@ -253,60 +216,101 @@ bool down = false;
 void nextDoinker() {
   down = !down;
 }
-void doinker(){
-  deviDoinker.set(down);
-}
 void liftControl() {
   double kp = 0.07; //tune this to your robot
   double error = target - roti.position(degrees);
   //If you don't have a rotation sensor, replace rotationSensor.position(degrees) with LB.position(degrees)
   rightLb.spin(forward, error*kp, volt);
   leftLb.spin(forward, error*kp, volt);
+  if(!reversed && currState == 1){
+    intake.resetPosition();
+    reversed = true;
+    intake.spin(reverse, 50, pct);
+  }
+  if(reversed && intake.position(degrees) >= -10){
+    intake.stop();
+  }
+  if(currState != 1){
+    reversed = false;
+  }
 }
-
+bool intOn = false;
+bool intForward = true;
+void intakeReverse(){
+  if(!intForward && intOn){
+    intOn = false;
+    return;
+  }
+  intForward = false;
+  if(!intOn){
+    intOn = true;
+  } 
+}
+void intakeForward(){
+  if(intForward && intOn){
+    intOn = false;
+    return;
+  }
+  intForward = true;
+  if(!intOn){
+    intOn = true;
+  } 
+}
+/*
+int intakeToggle = 0;
+0 is off, 1 is forward, 2, is reverse
+void intakeReverse(){
+  if(intakeToggle == 2) intakeToggle = 0;
+  else intakeToggle = 2;
+}
+void intakeForward(){
+  if(intakeToggle == 1) intakeToggle = 0;
+  else intakeToggle = 1;
+}
+*/
 void usercontrol(void) {
   // User control code here, inside the loop
-  thread r (reDirect);
   //roti.setReversed(true);
   roti.resetPosition();
   while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
-
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
-
-    //Replace this line with chassis.control_tank(); for tank drive 
-    //or chassis.control_holonomic(); for holo drive.    
     double leftSpeed = -(Controller1.Axis3.position() - (Controller1.Axis1.position() * .75));
     double rightSpeed = -(Controller1.Axis3.position() + (Controller1.Axis1.position() * .75));
     Brain.Screen.clearScreen();
     Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print(opt.hue());
+    Brain.Screen.print("intake on? " + intOn);
 
-    //exponents that *should* work: 2.12, 2.2, 2.28, 2.296, 2.36, 2.6, 2.76, 2.92, 3
-    
+    //exponents that *should* work: 2.12, 2.2, 2.28, 2.296, 2.36, 2.6, 2.76, 2.92, 
     leftFront.spin(fwd, pow(leftSpeed * .01, 5) * 100, pct);
     leftBack.spin(fwd, pow(leftSpeed * .01, 5) * 100, pct);
     leftMiddle.spin(fwd, pow(leftSpeed * .01, 5) * 100, pct);
     rightFront.spin(fwd, pow(rightSpeed * .01, 5) * 100, pct);
     rightBack.spin(fwd, pow(rightSpeed * .01, 5) * 100, pct);
     rightMiddle.spin(fwd, pow(rightSpeed * .01, 5) * 100, pct);
-  
-    if(Controller1.ButtonL2.pressing()){
-      intake.spin(reverse, 100, pct);
-    } else if(Controller1.ButtonL1.pressing()){
-      intakeToggle++;
-      if(intakeToggle == 1){
-        intake.spin(forward, 100, pct);
-      } else {
-        intake.stop();
-        intakeToggle = 0;
-      }
+    
+    //Controller1.ButtonL1.pressed(intakeReverse);
+    //Controller1.ButtonL2.pressed(intakeForward);
+    if(Controller1.ButtonL1.pressing()){
+      intakeForward();
+    } else if(Controller1.ButtonL2.pressing()){
+      intakeReverse();
     }
+    
+    if(intOn && intForward){
+      intake.spin(forward, 100, pct);
+    } else if(intOn && !intForward){
+      intake.spin(reverse, 100, pct);
+    } else {
+      intake.stop();
+    }
+    /*
+    if(intakeToggle == 2){
+      intake.spin(reverse, 100, pct);
+    } else if(intakeToggle == 1){
+     intake.spin(forward, 100, pct);
+    } else {
+     intake.stop();
+    }
+    */
   
     if(Controller1.ButtonR1.pressing()){
       clamp1.set(true);
@@ -315,7 +319,7 @@ void usercontrol(void) {
     }
 
     Controller1.ButtonA.pressed(nextDoinker);
-    doinker();
+    deviDoinker.set(down);
 
     Controller1.ButtonX.pressed(nextState);
     liftControl();
@@ -340,3 +344,5 @@ int main() {
     wait(100, msec);
   }
 }
+message.txt
+12 KB
