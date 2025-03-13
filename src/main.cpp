@@ -206,16 +206,20 @@ int states[numStates] = {0, -450, -55}; //Create array of target degree values
 int currState = 0;
 int target = 0;
 bool reversed = false;
+
 void nextState() {
   //Cycle to next state
   ++currState;
   if (currState == numStates) currState = 0;
   target = states[currState]; //Update target arm position
 }
+
 bool down = false;
+
 void nextDoinker() {
   down = !down;
 }
+
 void liftControl() {
   double kp = 0.07; //tune this to your robot
   double error = target - roti.position(degrees);
@@ -234,40 +238,9 @@ void liftControl() {
     reversed = false;
   }
 }
-bool intOn = false;
-bool intForward = true;
-void intakeReverse(){
-  if(!intForward && intOn){
-    intOn = false;
-    return;
-  }
-  intForward = false;
-  if(!intOn){
-    intOn = true;
-  } 
-}
-void intakeForward(){
-  if(intForward && intOn){
-    intOn = false;
-    return;
-  }
-  intForward = true;
-  if(!intOn){
-    intOn = true;
-  } 
-}
-/*
-int intakeToggle = 0;
-0 is off, 1 is forward, 2, is reverse
-void intakeReverse(){
-  if(intakeToggle == 2) intakeToggle = 0;
-  else intakeToggle = 2;
-}
-void intakeForward(){
-  if(intakeToggle == 1) intakeToggle = 0;
-  else intakeToggle = 1;
-}
-*/
+
+bool intakeOn = false;
+
 void usercontrol(void) {
   // User control code here, inside the loop
   //roti.setReversed(true);
@@ -277,8 +250,7 @@ void usercontrol(void) {
     double rightSpeed = -(Controller1.Axis3.position() + (Controller1.Axis1.position() * .75));
     Brain.Screen.clearScreen();
     Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print("intake on? " + intOn);
-
+    
     //exponents that *should* work: 2.12, 2.2, 2.28, 2.296, 2.36, 2.6, 2.76, 2.92, 
     leftFront.spin(fwd, pow(leftSpeed * .01, 5) * 100, pct);
     leftBack.spin(fwd, pow(leftSpeed * .01, 5) * 100, pct);
@@ -287,30 +259,30 @@ void usercontrol(void) {
     rightBack.spin(fwd, pow(rightSpeed * .01, 5) * 100, pct);
     rightMiddle.spin(fwd, pow(rightSpeed * .01, 5) * 100, pct);
     
-    //Controller1.ButtonL1.pressed(intakeReverse);
-    //Controller1.ButtonL2.pressed(intakeForward);
-    if(Controller1.ButtonL1.pressing()){
-      intakeForward();
-    } else if(Controller1.ButtonL2.pressing()){
-      intakeReverse();
+    //rewrite attempt
+    if (Controller1.ButtonL1.pressing()) {
+      while(Controller1.ButtonL1.pressing()){
+        wait(10, msec);
+      }
+      intakeOn = !intakeOn;  
+      if (intakeOn) {
+        intake.spin(forward, 100, pct);
+      } else {
+        intake.stop();
+      } 
     }
     
-    if(intOn && intForward){
-      intake.spin(forward, 100, pct);
-    } else if(intOn && !intForward){
-      intake.spin(reverse, 100, pct);
-    } else {
-      intake.stop();
+    if (Controller1.ButtonL2.pressing()) {
+      while(Controller1.ButtonL2.pressing()){
+        wait(10, msec);
+      }
+      intakeOn = !intakeOn;  
+      if (intakeOn) {
+        intake.spin(reverse, 100, pct);
+      } else {
+        intake.stop();
+      } 
     }
-    /*
-    if(intakeToggle == 2){
-      intake.spin(reverse, 100, pct);
-    } else if(intakeToggle == 1){
-     intake.spin(forward, 100, pct);
-    } else {
-     intake.stop();
-    }
-    */
   
     if(Controller1.ButtonR1.pressing()){
       clamp1.set(true);
@@ -344,5 +316,3 @@ int main() {
     wait(100, msec);
   }
 }
-message.txt
-12 KB
